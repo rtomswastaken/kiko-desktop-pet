@@ -58,30 +58,29 @@ func testPetStateMeters() {
 
 func testSpriteAnimationAdvance() {
     print("Testing SpriteAnimation frame advancement and ping-pong loop...")
-    let anim = SpriteAnimation(initialState: .walk)
+    let anim = SpriteAnimation(initialState: .run)
     assertEqual(anim.currentFrameIndex, 0)
     
-    // Advance past walk frame duration (0.15s)
-    let changed = anim.update(deltaTime: 0.16)
+    // Advance past run frame duration (0.085s)
+    let changed = anim.update(deltaTime: 0.10)
     assertTrue(changed, "Frame advanced")
     assertEqual(anim.currentFrameIndex, 1, "Moved to frame 1")
     
-    // Walk has 2 frames -> loops back to 0
-    let loopChanged = anim.update(deltaTime: 0.16)
-    assertTrue(loopChanged)
+    // Run has 7 frames -> after advancing 6 more times, loops back to 0
+    for _ in 0..<6 {
+        _ = anim.update(deltaTime: 0.10)
+    }
     assertEqual(anim.currentFrameIndex, 0, "Looped back to 0")
     
-    // Sleep is ping-pong (4 frames: 0, 1, 2, 3, 2, 1, 0...)
+    // Sleep is ping-pong (3 frames: 0, 1, 2, 1, 0...)
     let sleepAnim = SpriteAnimation(initialState: .sleep)
     assertEqual(sleepAnim.currentFrameIndex, 0)
-    _ = sleepAnim.update(deltaTime: 0.45)
+    _ = sleepAnim.update(deltaTime: 0.40)
     assertEqual(sleepAnim.currentFrameIndex, 1)
-    _ = sleepAnim.update(deltaTime: 0.45)
+    _ = sleepAnim.update(deltaTime: 0.40)
     assertEqual(sleepAnim.currentFrameIndex, 2)
-    _ = sleepAnim.update(deltaTime: 0.45)
-    assertEqual(sleepAnim.currentFrameIndex, 3)
-    _ = sleepAnim.update(deltaTime: 0.45)
-    assertEqual(sleepAnim.currentFrameIndex, 2, "Ping-pong reversed from 3 to 2")
+    _ = sleepAnim.update(deltaTime: 0.40)
+    assertEqual(sleepAnim.currentFrameIndex, 1, "Ping-pong reversed from 2 to 1")
 }
 
 func testActionPlanner() {
@@ -149,11 +148,13 @@ func testCursorFollower() {
 
 func testAvatarsAndMoods() {
     print("Testing CatAvatar and Mood mappings...")
-    assertEqual(CatAvatar.allCases.count, 4, "4 distinct avatars supported")
-    assertEqual(CatAvatar.kiko.spritePrefix, "kiko")
-    assertEqual(CatAvatar.smokey.spritePrefix, "smokey")
-    assertEqual(CatAvatar.kuro.spritePrefix, "kuro")
-    assertEqual(CatAvatar.mochi.spritePrefix, "mochi")
+    assertEqual(CatAvatar.allCases.count, 13, "13 distinct avatars & costumes supported")
+    assertEqual(CatAvatar.ginger.spritePrefix, "ginger")
+    assertEqual(CatAvatar.blackCat.spritePrefix, "blackcat")
+    assertEqual(CatAvatar.calico.spritePrefix, "calico")
+    assertEqual(CatAvatar.whiteCat.spritePrefix, "whitecat")
+    assertEqual(CatAvatar.astronaut.spritePrefix, "astronaut")
+    assertEqual(CatAvatar.batman.spritePrefix, "batman")
     
     // Mood speed multipliers
     assertTrue(Mood.excited.movementSpeedMultiplier > 2.0, "Excited mood has high speed")
@@ -163,10 +164,12 @@ func testAvatarsAndMoods() {
 func testBehaviourTypes() {
     print("Testing BehaviourType animation bindings...")
     assertEqual(BehaviourType.idle.associatedAnimation, .idle)
-    assertEqual(BehaviourType.walking.associatedAnimation, .walk)
+    assertEqual(BehaviourType.walking.associatedAnimation, .run)
     assertEqual(BehaviourType.excited.associatedAnimation, .run)
+    assertEqual(BehaviourType.jumping.associatedAnimation, .jump)
+    assertEqual(BehaviourType.playful.associatedAnimation, .attack)
     assertEqual(BehaviourType.sleeping.associatedAnimation, .sleep)
-    assertEqual(BehaviourType.stretching.associatedAnimation, .stretch)
+    assertEqual(BehaviourType.dramaticFlop.associatedAnimation, .die)
     assertEqual(BehaviourType.hiding.associatedAnimation, .box_peeking)
     assertEqual(BehaviourType.boxIdle.associatedAnimation, .box_head_out)
 }

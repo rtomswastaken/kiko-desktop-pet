@@ -1,4 +1,4 @@
-// Sources/Settings/Preferences.swift
+// Sources/KikoCore/Settings/Preferences.swift
 import Foundation
 
 @MainActor
@@ -53,11 +53,25 @@ public final class Preferences: ObservableObject {
         }
     }
     
+    @Published public var bedColor: String {
+        didSet {
+            defaults.set(bedColor, forKey: "kiko.bedColor")
+            BoxInteractionController.shared.boxWindow?.updateVisualState()
+        }
+    }
+    
+    @Published public var useCatBed: Bool {
+        didSet {
+            defaults.set(useCatBed, forKey: "kiko.useCatBed")
+            BoxInteractionController.shared.boxWindow?.updateVisualState()
+        }
+    }
+    
     private init() {
-        let avatarRaw = UserDefaults.standard.string(forKey: "kiko.selectedAvatar") ?? "kiko"
-        self.selectedAvatar = CatAvatar(rawValue: avatarRaw) ?? .kiko
+        let avatarRaw = UserDefaults.standard.string(forKey: "kiko.selectedAvatar") ?? "ginger"
+        self.selectedAvatar = CatAvatar(rawValue: avatarRaw) ?? .ginger
         self.customCatName = UserDefaults.standard.string(forKey: "kiko.customCatName") ?? "Kiko"
-        self.petScale = UserDefaults.standard.object(forKey: "kiko.petScale") as? Double ?? 2.0
+        self.petScale = UserDefaults.standard.object(forKey: "kiko.petScale") as? Double ?? 3.0
         self.soundEnabled = UserDefaults.standard.object(forKey: "kiko.soundEnabled") as? Bool ?? true
         self.soundVolume = UserDefaults.standard.object(forKey: "kiko.soundVolume") as? Float ?? 0.8
         self.cursorTrackingEnabled = UserDefaults.standard.object(forKey: "kiko.cursorTrackingEnabled") as? Bool ?? true
@@ -65,5 +79,7 @@ public final class Preferences: ObservableObject {
         self.windowInteractionsEnabled = UserDefaults.standard.object(forKey: "kiko.windowInteractionsEnabled") as? Bool ?? true
         self.isPetVisible = UserDefaults.standard.object(forKey: "kiko.isPetVisible") as? Bool ?? true
         self.boxVisible = UserDefaults.standard.object(forKey: "kiko.boxVisible") as? Bool ?? true
+        self.bedColor = UserDefaults.standard.string(forKey: "kiko.bedColor") ?? "blue"
+        self.useCatBed = UserDefaults.standard.object(forKey: "kiko.useCatBed") as? Bool ?? true
     }
 }

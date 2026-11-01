@@ -88,10 +88,15 @@ public final class PetWindow: NSPanel {
             (behaviourEngine.currentBehaviour == .walking || behaviourEngine.currentBehaviour == .idle) {
             if let titleBar = WindowDetector.shared.findNearestTitleBar(to: petState.position, maxDistance: 40.0) {
                 // If cat is very close to title bar, it can rest on top of it!
-                if !petState.isPerchedOnWindow && Double.random(in: 0...1) < 0.05 {
+                if !petState.isPerchedOnWindow && Double.random(in: 0...1) < 0.08 {
                     petState.isPerchedOnWindow = true
                     petState.position.y = titleBar.topEdgeY
-                    behaviourEngine.transitionTo(.windowWatching)
+                    behaviourEngine.transitionTo(.jumping)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                        if behaviourEngine.currentBehaviour == .jumping {
+                            behaviourEngine.transitionTo(.windowWatching)
+                        }
+                    }
                 }
             } else {
                 petState.isPerchedOnWindow = false

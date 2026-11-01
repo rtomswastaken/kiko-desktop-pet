@@ -1,4 +1,4 @@
-// Sources/Behaviour/ActionPlanner.swift
+// Sources/KikoCore/Behaviour/ActionPlanner.swift
 import Foundation
 
 public struct ActionPlanner: Sendable {
@@ -8,7 +8,7 @@ public struct ActionPlanner: Sendable {
         boredom: Double,
         inactivityDuration: TimeInterval = 0.0,
         mood: Mood = .happy,
-        personality: Personality = .kiko,
+        personality: Personality = .ginger,
         nearBox: Bool = false
     ) -> BehaviourType {
         // 1. Critical low energy -> must sleep
@@ -45,20 +45,21 @@ public struct ActionPlanner: Sendable {
             }
             return .sleeping
             
+        case .dramaticFlop:
+            return energy < 0.5 ? .sleeping : .idle
+            
         case .stretching:
             // After stretch, transition to curious or walking
             let roll = Double.random(in: 0...1)
             return roll < 0.6 ? .idle : .walking
             
         case .hiding:
-            // Transition from hiding to peeking head out
             if mood == .playful || boredom > 0.5 {
                 return .boxIdle
             }
             return .hiding
             
         case .boxIdle:
-            // Pop out of box if energetic or curious
             if energy > 0.5 && Double.random(in: 0...1) < (personality.curious * 0.7) {
                 return .stretching
             }
@@ -69,20 +70,22 @@ public struct ActionPlanner: Sendable {
             
         case .grumpy:
             if Double.random(in: 0...1) < 0.4 {
-                return .idle
+                return .sitting
             }
             return .grumpy
             
         case .excited:
-            // Zoomies wind down when energy is spent
             if energy < 0.45 {
                 return .idle
             }
             return .excited
             
+        case .jumping:
+            return .windowWatching
+            
         case .playing:
             if boredom < 0.2 || energy < 0.3 {
-                return .idle
+                return .sitting
             }
             return .playing
             
@@ -92,32 +95,33 @@ public struct ActionPlanner: Sendable {
             }
             return .windowWatching
             
-        case .idle:
-            // From idle: weighted roll influenced by traits
+        case .sitting, .idle:
             let roll = Double.random(in: 0...100)
             let zoomieChance = personality.energetic * (boredom > 0.7 ? 25.0 : 8.0)
             let sleepChance = personality.lazy * (energy < 0.45 ? 40.0 : 15.0)
             let curiousChance = personality.curious * 30.0
-            let walkChance = 35.0
+            let flopChance = 10.0
+            let walkChance = 30.0
             
             if roll < zoomieChance {
                 return .excited
             } else if roll < zoomieChance + sleepChance {
                 return .sleeping
-            } else if roll < zoomieChance + sleepChance + curiousChance {
+            } else if roll < zoomieChance + sleepChance + flopChance {
+                return .dramaticFlop
+            } else if roll < zoomieChance + sleepChance + flopChance + curiousChance {
                 return .curious
-            } else if roll < zoomieChance + sleepChance + curiousChance + walkChance {
+            } else if roll < zoomieChance + sleepChance + flopChance + curiousChance + walkChance {
                 return .walking
             } else {
                 return .watchingCursor
             }
             
         case .walking, .running:
-            // Finished a walk leg
             let roll = Double.random(in: 0...1)
-            if roll < 0.45 {
+            if roll < 0.40 {
                 return .idle
-            } else if roll < 0.75 {
+            } else if roll < 0.70 {
                 return .curious
             } else {
                 return .watchingCursor
@@ -126,13 +130,13 @@ public struct ActionPlanner: Sendable {
         case .playful, .curious, .watchingCursor:
             let roll = Double.random(in: 0...1)
             if roll < 0.5 {
-                return .idle
+                return .sitting
             } else {
                 return .walking
             }
             
         case .interacting, .dragged:
-            return .idle
+            return .sitting
         }
     }
 }

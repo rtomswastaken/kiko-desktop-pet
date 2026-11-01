@@ -24,9 +24,19 @@ public final class BehaviourEngine {
         currentBehaviour = newBehaviour
         
         switch newBehaviour {
-        case .idle:
+        case .idle, .sitting:
             stateTimeRemaining = Double.random(in: 2.0...6.0)
             PetState.shared.velocity = .zero
+            
+        case .jumping:
+            stateTimeRemaining = 0.9
+            PetState.shared.velocity = .zero
+            SoundManager.shared.play(.pounce)
+            
+        case .dramaticFlop:
+            stateTimeRemaining = 1.4
+            PetState.shared.velocity = .zero
+            SoundManager.shared.play(.meow)
             
         case .walking:
             stateTimeRemaining = Double.random(in: Constants.minWalkDuration...Constants.maxWalkDuration)

@@ -99,5 +99,9 @@ public struct Personality: Sendable, Codable {
         independent: 0.20
     )
     
+    public static let ginger = kiko
+    public static let blackCat = kuro
+    public static let whiteCat = mochi
+    public static let brownCat = smokey
     public static let standard = kiko
 }

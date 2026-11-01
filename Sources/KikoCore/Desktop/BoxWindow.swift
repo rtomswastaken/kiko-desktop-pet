@@ -1,4 +1,4 @@
-// Sources/Desktop/BoxWindow.swift
+// Sources/KikoCore/Desktop/BoxWindow.swift
 import AppKit
 
 @MainActor
@@ -42,19 +42,24 @@ public final class BoxWindow: NSPanel {
     
     public func updateVisualState() {
         let petState = PetState.shared
+        let prefs = Preferences.shared
         let imgName: String
         
-        if petState.isInBox {
-            switch BehaviourEngine.shared.currentBehaviour {
-            case .hiding, .sleeping:
-                imgName = "cardboard_box_peeking.png"
-            case .boxIdle, .watchingCursor:
-                imgName = "\(petState.currentAvatar.spritePrefix)_box_head_out.png"
-            default:
+        if prefs.useCatBed {
+            imgName = "cat_bed_\(prefs.bedColor).png"
+        } else {
+            if petState.isInBox {
+                switch BehaviourEngine.shared.currentBehaviour {
+                case .hiding, .sleeping:
+                    imgName = "cardboard_box_peeking.png"
+                case .boxIdle, .watchingCursor:
+                    imgName = "\(petState.currentAvatar.spritePrefix)_sitting_0.png"
+                default:
+                    imgName = "cardboard_box_empty.png"
+                }
+            } else {
                 imgName = "cardboard_box_empty.png"
             }
-        } else {
-            imgName = "cardboard_box_empty.png"
         }
         
         if let img = SpriteManager.shared.specialImage(named: imgName) {
@@ -67,7 +72,6 @@ public final class BoxWindow: NSPanel {
         dragStartMouseLocation = NSEvent.mouseLocation
         dragStartWindowOrigin = self.frame.origin
         
-        // Clicking box if cat is inside wakes cat or prompts peeking
         if PetState.shared.isInBox {
             SoundManager.shared.play(.purr)
             BehaviourEngine.shared.transitionTo(.boxIdle)
@@ -89,7 +93,6 @@ public final class BoxWindow: NSPanel {
         }
         self.setFrameOrigin(newOrigin)
         
-        // Save box location
         UserDefaults.standard.set(newOrigin.x, forKey: "kiko.boxOriginX")
         UserDefaults.standard.set(newOrigin.y, forKey: "kiko.boxOriginY")
     }

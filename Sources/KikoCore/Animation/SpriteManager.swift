@@ -1,4 +1,4 @@
-// Sources/Animation/SpriteManager.swift
+// Sources/KikoCore/Animation/SpriteManager.swift
 import AppKit
 
 @MainActor
@@ -16,24 +16,31 @@ public final class SpriteManager {
             return cached
         }
         
+        // Match action to filename
         let filename: String
         switch state {
+        case .sitting:
+            filename = "\(prefix)_sitting_\(frameIndex).png"
         case .idle:
-            filename = "\(prefix)_sit_\(frameIndex).png"
-        case .walk, .run:
-            filename = "\(prefix)_walk_\(frameIndex).png"
+            filename = "\(prefix)_idle_\(frameIndex).png"
+        case .idle2:
+            filename = "\(prefix)_idle2_\(frameIndex).png"
+        case .run:
+            filename = "\(prefix)_run_\(frameIndex).png"
+        case .jump:
+            filename = "\(prefix)_jump_\(frameIndex).png"
+        case .attack:
+            filename = "\(prefix)_attack_\(frameIndex).png"
+        case .hurt, .dragged:
+            filename = "\(prefix)_hurt_\(frameIndex).png"
         case .sleep:
             filename = "\(prefix)_sleep_\(frameIndex).png"
-        case .stretch:
-            filename = "\(prefix)_stretch_\(frameIndex).png"
-        case .climb:
-            filename = "kiko_climb.png"
+        case .die:
+            filename = "\(prefix)_die_\(frameIndex).png"
         case .box_peeking:
             filename = "cardboard_box_peeking.png"
         case .box_head_out:
-            filename = "\(prefix)_box_head_out.png"
-        case .dragged, .surprised:
-            filename = "\(prefix)_sit_0.png"
+            filename = "\(prefix)_sitting_0.png"
         }
         
         if let img = loadImage(named: filename) {
@@ -41,20 +48,17 @@ public final class SpriteManager {
             return img
         }
         
-        // Fallback to kiko base if variant missing
-        let fallbackFilename: String
-        switch state {
-        case .idle, .dragged, .surprised: fallbackFilename = "kiko_sit_0.png"
-        case .walk, .run: fallbackFilename = "kiko_walk_0.png"
-        case .sleep: fallbackFilename = "kiko_sleep_0.png"
-        case .stretch: fallbackFilename = "kiko_stretch_0.png"
-        case .climb: fallbackFilename = "kiko_climb.png"
-        case .box_peeking: fallbackFilename = "cardboard_box_peeking.png"
-        case .box_head_out: fallbackFilename = "cardboard_box_head_out.png"
-        }
+        // Fallback to ginger (default avatar) if variant file missing
+        let fallbackFilename = "ginger_\(state.rawValue)_\(frameIndex).png"
         if let fallbackImg = loadImage(named: fallbackFilename) {
             imageCache[key] = fallbackImg
             return fallbackImg
+        }
+        
+        // Fallback to idle 0
+        if let idle0 = loadImage(named: "\(prefix)_idle_0.png") ?? loadImage(named: "ginger_idle_0.png") {
+            imageCache[key] = idle0
+            return idle0
         }
         
         return nil
@@ -74,6 +78,7 @@ public final class SpriteManager {
     private func loadImage(named filename: String) -> NSImage? {
         let candidatePaths = [
             "assets/sprites/processed/\(filename)",
+            "assets/kiko_cat_sprites/\(filename)",
             "Assets/sprites/processed/\(filename)",
             "../assets/sprites/processed/\(filename)",
             "../../assets/sprites/processed/\(filename)",

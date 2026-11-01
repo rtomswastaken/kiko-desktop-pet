@@ -104,11 +104,27 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         
         menu.addItem(NSMenuItem.separator())
         
-        // Cardboard box toggle
-        let boxToggleTitle = prefs.boxVisible ? "Hide Cardboard Box" : "Show Cardboard Box"
-        let boxItem = NSMenuItem(title: boxToggleTitle, action: #selector(toggleBox), keyEquivalent: "")
-        boxItem.target = self
-        menu.addItem(boxItem)
+        // Resting Spot Submenu
+        let restMenu = NSMenu()
+        let toggleBoxVisible = NSMenuItem(
+            title: prefs.boxVisible ? "Hide Resting Spot" : "Show Resting Spot",
+            action: #selector(toggleBox),
+            keyEquivalent: ""
+        )
+        toggleBoxVisible.target = self
+        restMenu.addItem(toggleBoxVisible)
+        
+        let switchStyleItem = NSMenuItem(
+            title: prefs.useCatBed ? "Switch to Cardboard Box" : "Switch to Cat Bed",
+            action: #selector(toggleBedStyle),
+            keyEquivalent: ""
+        )
+        switchStyleItem.target = self
+        restMenu.addItem(switchStyleItem)
+        
+        let restParentItem = NSMenuItem(title: "Cozy Resting Spot", action: nil, keyEquivalent: "")
+        restParentItem.submenu = restMenu
+        menu.addItem(restParentItem)
         
         // Reset Position
         let resetItem = NSMenuItem(title: "Reset Cat Position", action: #selector(resetPosition), keyEquivalent: "r")
@@ -172,6 +188,11 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     
     @objc private func toggleBox() {
         Preferences.shared.boxVisible.toggle()
+        updateMenu()
+    }
+    
+    @objc private func toggleBedStyle() {
+        Preferences.shared.useCatBed.toggle()
         updateMenu()
     }
     
