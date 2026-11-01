@@ -1,0 +1,38 @@
+# Packages & Build Artifacts
+.build/
+.swiftpm/
+DerivedData/
+*.xcodeproj
+*.xcworkspace
+*.ipa
+*.dSYM/
+*.app
+
+# macOS System Files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# User / IDE files
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+*.swp
+*~
+.vscode/
+
+# Third-Party Original Art Assets (Excluded per ToffeeCraft Itch.io Redistribution License)
+# Original assets must be acquired directly by developers from https://toffeecraft.itch.io/cat-pack-pochi
+assets/sprites/original/*.png
+assets/sprites/original/*.zip
+RetroCatsFree.png
+!assets/sprites/original/README.md
+!assets/sprites/original/.gitkeep
+
+# Temporary & Inspection Scripts/Artifacts
+tmp_inspect/
+debug_inspect/
+*.tmp
