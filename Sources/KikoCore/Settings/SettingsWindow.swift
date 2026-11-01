@@ -137,25 +137,25 @@ public struct SettingsView: View {
                         .font(.subheadline).bold()
                     
                     HStack(spacing: 8) {
-                        Button("🔴 Laser Dot") {
+                        Button("Laser Dot") {
                             MiniGameManager.shared.startLaserPointer()
                         }
-                        Button("🧶 Yarn Ball") {
+                        Button("Yarn Ball") {
                             MiniGameManager.shared.startYarnBall()
                         }
-                        Button("🐟 Fish Treat") {
+                        Button("Fish Treat") {
                             MiniGameManager.shared.dropFishTreat()
                         }
                     }
                     
                     HStack(spacing: 8) {
-                        Button("⚡ Zoomies!") {
+                        Button("Trigger Zoomies") {
                             BehaviourEngine.shared.triggerZoomies()
                         }
-                        Button("😴 Put to Sleep") {
+                        Button("Put to Sleep") {
                             BehaviourEngine.shared.forceSleep()
                         }
-                        Button("📍 Reset Position") {
+                        Button("Reset Position") {
                             if let screen = NSScreen.main {
                                 PetState.shared.position = CGPoint(x: screen.visibleFrame.midX, y: screen.visibleFrame.midY)
                             }

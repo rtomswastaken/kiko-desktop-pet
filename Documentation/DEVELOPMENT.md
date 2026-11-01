@@ -1,4 +1,4 @@
-# Development & Contributing Guide 🛠️
+# Development and Contributing Guide
 
 This guide covers setting up your local environment, building Kiko from the command line or Xcode, running tests, and debugging desktop pet behavior.
 

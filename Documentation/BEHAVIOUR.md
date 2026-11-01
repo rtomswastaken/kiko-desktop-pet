@@ -1,4 +1,4 @@
-# Autonomous Behaviour & Mood System 🐈
+# Autonomous Behaviour and Mood System
 
 Kiko is driven by an autonomous finite-state machine (FSM) that models realistic feline psychology, mood transitions, energy cycles, and environment awareness.
 

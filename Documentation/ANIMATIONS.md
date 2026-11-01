@@ -1,6 +1,6 @@
-# Animation System & Sprite Specifications 🐈
+# Animation System and Sprite Specifications
 
-Kiko relies on authentic pixel art derived from ToffeeCraft's retro cat collection (`RetroCatsFree.png`). The animation system is engineered to honor retro pixel constraints while delivering smooth, characterful motion on modern Retina displays.
+Kiko relies on authentic 32x32 pixel art with the midnight Black Cat as the primary companion. The animation system is engineered to honor retro pixel constraints while delivering smooth, characterful motion on modern Retina displays.
 
 ---
 
@@ -10,72 +10,57 @@ Kiko relies on authentic pixel art derived from ToffeeCraft's retro cat collecti
    - High-DPI Retina screens blur pixel art if linear interpolation is used.
    - All CALayers enforce nearest-neighbor filtering to keep pixel edges crisp and sharp.
 2. **Integer Scaling:**
-   - Supported desktop scales: **1×** (64×64 pt), **1.5×** (96×96 pt), **2×** (128×128 pt default), and **3×** (192×192 pt).
+   - Supported desktop scales: **1x** (32x32 pt), **2x** (64x64 pt), **3x** (96x96 pt), and **4x** (128x128 pt).
 3. **Elastic Squash & Stretch:**
    - Real-time `CATransform3DScale` and `CATransform3DRotate` during mouse drag.
    - Gentle vertical stretch when picked up (`scaleX: 0.90, scaleY: 1.15`).
-   - Wiggle flail (`sin(wigglePhase) * 0.18`) during fast dragging.
+   - Wiggle flail during fast dragging.
    - Soft landing bounce recovery on release.
 
 ---
 
 ## 2. Animation Sequences
 
-### 1. Sitting / Idle (`sit`)
-- **Frames:** 4 frames (`sit_0` through `sit_3`)
-- **Frame Rate:** 4.0 fps (280 ms per frame)
-- **Playback Mode:** Continuous forward loop
-- **Visual Description:** Standard sitting posture, gentle inhale, tail twitch, and blinking eyes.
+All cat animations are 32x32 pixel art strips:
 
-### 2. Walking (`walk`)
-- **Frames:** 2 frames (`walk_0`, `walk_1`)
-- **Frame Rate:** ~7.0 fps (150 ms per frame)
-- **Playback Mode:** Continuous forward loop
-- **Movement Speed:** ~70 points / second across the screen. Alternating paw stride.
-
-### 3. Running / Zoomies (`run`)
-- **Frames:** 2 frames (`walk_0`, `walk_1`) at double speed (0.08s per frame)
-- **Movement Speed:** 140 to 320 points / second across the screen.
-
-### 4. Sleeping / Loaf (`sleep`)
-- **Frames:** 4 frames (`sleep_0` through `sleep_3`)
-- **Frame Rate:** 2.5 fps (420 ms per frame)
-- **Playback Mode:** Ping-pong loop (0 → 1 → 2 → 3 → 2 → 1 → 0)
-- **Visual Description:** Cat curled into a loaf, rhythmic deep breathing with chest rise and fall. Accompanied by floating `fx_zzz.png` particles.
-
-### 5. Stretching (`stretch`)
-- **Frames:** 3 frames (`stretch_0` through `stretch_2`)
-- **Frame Rate:** ~3.0 fps (350 ms per frame)
-- **Visual Description:** Full body stretch extending front paws and arching back after naps.
-
-### 6. Climbing / High Reach (`climb`)
-- **Frames:** 1 frame (`kiko_climb.png`)
-- **Visual Description:** Standing on hind legs reaching up toward window title bar or scratch tree.
-
-### 7. Cardboard Box Peeking & Head-Out
-- **Frames:** 
-  - `cardboard_box_peeking.png`: Two glowing curious eyes peeking from dark box opening.
-  - `*_box_head_out.png`: Cat head and front paws resting over the cardboard rim.
+| Action | Frame Count | Timing | Playback Mode | Description |
+|---|---|---|---|---|
+| **Sitting** | 3 frames | 0.28s / frame | Forward Loop | Cat sitting upright, gentle tail twitch, watchful eyes. |
+| **Idle** | 7 frames | 0.20s / frame | Forward Loop | Standing idle, blinking, tail swaying, looking around. |
+| **Idle2** | 14 frames | 0.18s / frame | Forward Loop | Detailed grooming, licking paws, sniffing the air. |
+| **Run** | 7 frames | 0.10s / frame | Forward Loop | Four-paw gallop across the desktop during roaming and zoomies. |
+| **Jump** | 13 frames | 0.08s / frame | Triggered | Full leaping arc onto window titlebars, cat beds, and desk borders. |
+| **Attack** | 9 frames | 0.10s / frame | Triggered | Pouncing and batting at laser dots, yarn balls, and treats. |
+| **Hurt / Drag** | 7 frames | 0.14s / frame | Continuous | Picked up by the scruff, suspended paws reacting to cursor motion. |
+| **Sleep** | 3 frames | 0.45s / frame | Ping-Pong Loop | Curled into a loaf, rhythmic deep breathing with chest rise. |
+| **Die / Flop** | 15 frames | 0.12s / frame | Triggered | Dramatic playful flop onto back with belly exposed. |
+| **Die2** | 14 frames | 0.12s / frame | Triggered | Dramatic flop variation, sprawling out flat on the desktop. |
 
 ---
 
 ## 3. Multiple Cat Avatars
 
-The application includes 4 distinct cat breeds/avatars, each with their own matching animation set:
+The application includes 13 distinct cat breeds and costumes, with the midnight Black Cat as default:
 
-| Avatar | Key | Description | Default Personality |
-|---|---|---|---|
-| **Kiko** | `kiko` | Ginger Tabby | Energetic, curious, cuddly |
-| **Smokey** | `smokey` | Grey / Silver Tabby | Lazy, sleepy, relaxed |
-| **Kuro** | `kuro` | Midnight Black Void | Mischievous, quick, independent |
-| **Mochi** | `mochi` | Snow White | Playful, affectionate, sweet |
+| Avatar | Key | Description |
+|---|---|---|
+| **Black Cat (Kiko)** | `blackcat` | Sleek midnight black cat with golden glowing eyes and swift reflexes (Default). |
+| **Ginger** | `ginger` | Cheerful orange tabby who loves jumping on windows and chasing toys. |
+| **Calico** | `calico` | Lucky three-color calico with a sweet, curious disposition. |
+| **White Cat (Mochi)** | `whitecat` | Snowy white cat who loves head pats and warm naps. |
+| **Brown Cat** | `browncat` | Relaxed, cuddly brown cat who loves loafing. |
+| **Siamese** | `siamese` | Elegant Siamese cat with inquisitive bright eyes. |
+| **Tiger** | `tiger` | Striped tiger cat always ready for pounces and zoomies. |
+| **Astronaut** | `astronaut` | Space-faring cat equipped with an authentic astronaut suit. |
+| **Batcat** | `batman` | Masked desktop hero watching from window ledges. |
+| **Little Demon** | `demon` | Horned troublemaker packed with chaotic zoomie energy. |
+| **Santa Cat** | `santa` | Festive holiday cat spreading cozy winter cheer. |
+| **Vampire** | `vampire` | Spooky creature of the night who loves sleeping in shadows. |
+| **Witch** | `witch` | Magical feline companion complete with witchy robes. |
 
 ---
 
-## 4. Desktop Toys & Particle Sprites
+## 4. Desktop Toys and Fixtures
 
-- **Yarn Balls:** 8 retro colors (`yarn_ball_0.png` through `yarn_ball_7.png`) with physics bounces.
-- **Butterfly:** 2-frame wing-flapping animation (`butterfly_0.png`, `butterfly_1.png`).
-- **Fish Treat:** Savory fish snack (`fish_treat.png`).
-- **Laser Dot:** Red glowing dot (`laser_dot.png`).
-- **Particles:** Floating heart (`fx_heart.png`), sleepy Zzz (`fx_zzz.png`), and sparkles (`fx_sparkle.png`).
+- **Cat Beds:** 6 pastel color variations (`CatBedBlue`, `CatBedPink`, `CatBedGreen`, `CatBedPurple`, `CatBedBrown`, `CatBedRed`).
+- **Interactive Props:** Food bowl, bath tub, fish treat snack, and yarn ball.

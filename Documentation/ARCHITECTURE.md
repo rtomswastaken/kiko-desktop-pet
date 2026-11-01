@@ -1,4 +1,4 @@
-# Architecture of Kiko 🐈
+# Architecture of Kiko
 
 Kiko is designed as a native, lightweight, and battery-friendly macOS desktop pet. It runs as a low-overhead menu-bar and floating-window application using Apple's modern Swift frameworks (AppKit, SwiftUI, and SpriteKit/CoreAnimation).
 

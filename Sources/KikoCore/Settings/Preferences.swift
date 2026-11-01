@@ -68,8 +68,8 @@ public final class Preferences: ObservableObject {
     }
     
     private init() {
-        let avatarRaw = UserDefaults.standard.string(forKey: "kiko.selectedAvatar") ?? "ginger"
-        self.selectedAvatar = CatAvatar(rawValue: avatarRaw) ?? .ginger
+        let avatarRaw = UserDefaults.standard.string(forKey: "kiko.selectedAvatar") ?? "blackcat"
+        self.selectedAvatar = CatAvatar(rawValue: avatarRaw) ?? .blackCat
         self.customCatName = UserDefaults.standard.string(forKey: "kiko.customCatName") ?? "Kiko"
         self.petScale = UserDefaults.standard.object(forKey: "kiko.petScale") as? Double ?? 3.0
         self.soundEnabled = UserDefaults.standard.object(forKey: "kiko.soundEnabled") as? Bool ?? true

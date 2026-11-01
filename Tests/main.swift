@@ -11,7 +11,7 @@ func assertEqual<T: Equatable>(_ a: T, _ b: T, _ message: String = "", file: Str
         passedCount += 1
     } else {
         failedCount += 1
-        print("❌ FAIL [\(line)]: \(a) != \(b) | \(message)")
+        print("FAIL [\(line)]: \(a) != \(b) | \(message)")
     }
 }
 
@@ -20,7 +20,7 @@ func assertTrue(_ condition: Bool, _ message: String = "", file: String = #file,
         passedCount += 1
     } else {
         failedCount += 1
-        print("❌ FAIL [\(line)]: condition is false | \(message)")
+        print("FAIL [\(line)]: condition is false | \(message)")
     }
 }
 
@@ -187,7 +187,7 @@ func testWindowDetectionMath() {
 @MainActor
 func runAllTests() {
     print("\n===============================")
-    print("🐾 RUNNING KIKO DESKTOP PET TEST SUITE")
+    print("RUNNING KIKO DESKTOP PET TEST SUITE")
     print("===============================\n")
     
     testPersonalityPresets()

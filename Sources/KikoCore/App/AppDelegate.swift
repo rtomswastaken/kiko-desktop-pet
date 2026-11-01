@@ -31,7 +31,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem?.button {
-            button.title = "🐈"
+            button.title = "Kiko"
             button.toolTip = "Desktop Cat Companion"
         }
         
@@ -45,7 +45,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         let petState = PetState.shared
         
         // Title & status header
-        let statusTitle = "\(prefs.customCatName) (\(prefs.selectedAvatar.shortName)) • \(petState.currentMood.emoji) \(petState.currentMood.rawValue)"
+        let statusTitle = "\(prefs.customCatName) (\(prefs.selectedAvatar.shortName)) - \(petState.currentMood.tag)"
         let titleItem = NSMenuItem(title: statusTitle, action: nil, keyEquivalent: "")
         titleItem.isEnabled = false
         menu.addItem(titleItem)
@@ -53,15 +53,15 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         
         // Mini-Games Submenu
         let playMenu = NSMenu()
-        let laserItem = NSMenuItem(title: "🔴 Laser Pointer", action: #selector(startLaser), keyEquivalent: "l")
+        let laserItem = NSMenuItem(title: "Laser Pointer", action: #selector(startLaser), keyEquivalent: "l")
         laserItem.target = self
         playMenu.addItem(laserItem)
         
-        let yarnItem = NSMenuItem(title: "🧶 Yarn Ball", action: #selector(startYarnBall), keyEquivalent: "y")
+        let yarnItem = NSMenuItem(title: "Yarn Ball", action: #selector(startYarnBall), keyEquivalent: "y")
         yarnItem.target = self
         playMenu.addItem(yarnItem)
         
-        let treatItem = NSMenuItem(title: "🐟 Give Fish Treat", action: #selector(giveTreat), keyEquivalent: "t")
+        let treatItem = NSMenuItem(title: "Give Fish Treat", action: #selector(giveTreat), keyEquivalent: "t")
         treatItem.target = self
         playMenu.addItem(treatItem)
         
@@ -86,7 +86,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         for avatar in CatAvatar.allCases {
             let isSelected = prefs.selectedAvatar == avatar
             let item = NSMenuItem(
-                title: "\(isSelected ? "✓ " : "")\(avatar.displayName)",
+                title: "\(isSelected ? "[*] " : "    ")\(avatar.displayName)",
                 action: #selector(selectAvatarFromMenu(_:)),
                 keyEquivalent: ""
             )

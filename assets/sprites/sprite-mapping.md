@@ -1,4 +1,4 @@
-# Sprite Mapping & Animation Atlas 🐈
+# Sprite Mapping and Animation Atlas
 
 This document outlines the frame mappings, bounding boxes, animation frame rates, and state triggers for **Kiko** using the complete **`kiko_cat_sprites`** collection and desktop interactive objects.
 

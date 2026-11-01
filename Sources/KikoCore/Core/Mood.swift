@@ -1,4 +1,4 @@
-// Sources/Core/Mood.swift
+// Sources/KikoCore/Core/Mood.swift
 import Foundation
 
 public enum Mood: String, CaseIterable, Sendable {
@@ -12,18 +12,12 @@ public enum Mood: String, CaseIterable, Sendable {
     case scared = "Scared"
     case relaxed = "Relaxed"
     
+    public var tag: String {
+        return "[\(rawValue)]"
+    }
+    
     public var emoji: String {
-        switch self {
-        case .happy: return "😸"
-        case .sleepy: return "😴"
-        case .curious: return "😺"
-        case .playful: return "😼"
-        case .grumpy: return "😾"
-        case .excited: return "😻"
-        case .bored: return "🥱"
-        case .scared: return "🙀"
-        case .relaxed: return "😽"
-        }
+        return tag
     }
     
     public var description: String {
@@ -33,9 +27,9 @@ public enum Mood: String, CaseIterable, Sendable {
         case .curious: return "Investigating desktop surroundings and windows"
         case .playful: return "Ready to chase cursors and toys"
         case .grumpy: return "Aloof and doing its own thing"
-        case .excited: return "Bursting with bouncy energy!"
+        case .excited: return "Bursting with bouncy energy"
         case .bored: return "Seeking something novel to explore"
-        case .scared: return "Startled! Retreating to safety"
+        case .scared: return "Startled, retreating to safety"
         case .relaxed: return "Peacefully watching the desktop world"
         }
     }

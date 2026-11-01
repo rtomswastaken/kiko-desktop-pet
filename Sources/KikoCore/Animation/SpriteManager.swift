@@ -65,9 +65,9 @@ public final class SpriteManager {
             }
         }
         
-        // Fallback to ginger (default avatar) if variant file missing
-        let fallbackGinger = "ginger_\(state.rawValue)_\(frameIndex).png"
-        if let fallbackImg = loadImage(named: fallbackGinger) {
+        // Fallback to blackcat (default avatar) if variant file missing
+        let fallbackBlackCat = "blackcat_\(state.rawValue)_\(frameIndex).png"
+        if let fallbackImg = loadImage(named: fallbackBlackCat) {
             imageCache[key] = fallbackImg
             return fallbackImg
         }
@@ -75,8 +75,8 @@ public final class SpriteManager {
         // Guaranteed fallback to any valid standing/sitting frame so cat NEVER vanishes
         if let fallbackAny = loadImage(named: "\(prefix)_idle_0.png") ??
                              loadImage(named: "\(prefix)_sitting_0.png") ??
-                             loadImage(named: "ginger_idle_0.png") ??
-                             loadImage(named: "ginger_sitting_0.png") {
+                             loadImage(named: "blackcat_idle_0.png") ??
+                             loadImage(named: "blackcat_sitting_0.png") {
             imageCache[key] = fallbackAny
             return fallbackAny
         }

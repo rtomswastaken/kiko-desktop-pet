@@ -1,64 +1,109 @@
 #!/usr/bin/env python3
 """
 slice_sprites.py
-Utility script to extract individual 64x64 animation frames and sprites
-from the original ToffeeCraft 'Cat Pack - Pochi' sprite sheet.
+Utility script to slice 32x32 animation frame strips into individual frames
+for Kiko desktop pet avatars and fixtures.
 """
 
 import os
-import sys
+import glob
 from PIL import Image
 
 def slice_sprites():
-    possible_paths = [
-        "assets/sprites/original/RetroCatsFree.png",
-        "Assets/RetroCatsFree.png"
+    src_dir = None
+    candidates = [
+        "assets/sprites/original",
+        "/Users/rtoms/Downloads/kiko_cat_sprites"
     ]
-    
-    src_path = None
-    for p in possible_paths:
-        if os.path.exists(p):
-            src_path = p
+    for c in candidates:
+        if os.path.exists(c) and len(glob.glob(os.path.join(c, "*Sitting_Normal.png"))) > 0:
+            src_dir = c
             break
             
-    if not src_path:
-        print("Error: RetroCatsFree.png not found.")
-        print("Please download it from https://toffeecraft.itch.io/cat-pack-pochi")
-        print("and place it at assets/sprites/original/RetroCatsFree.png")
-        sys.exit(1)
-        
-    print(f"Loading sprite sheet from: {src_path}")
-    sheet = Image.open(src_path)
-    
+    if not src_dir:
+        print("Error: sprite source directory not found.")
+        return
+
     out_dir = "assets/sprites/processed"
     os.makedirs(out_dir, exist_ok=True)
     
-    # Sitting / Idle: Row 0 (4 frames, 64x64)
-    for i in range(4):
-        frame = sheet.crop((i * 64, 0, (i + 1) * 64, 64))
-        frame.save(f"{out_dir}/kiko_sit_{i}.png")
-    print("✓ Extracted 4 sitting/idle frames")
+    print(f"Loading sprite strips from: {src_dir}")
     
-    # Walking / Running: Row 1 (2 frames, 64x64)
-    for i in range(2):
-        frame = sheet.crop((i * 64, 64, (i + 1) * 64, 128))
-        frame.save(f"{out_dir}/kiko_walk_{i}.png")
-    print("✓ Extracted 2 walking frames")
+    avatar_mapping = {
+        "BlackCat": "blackcat",
+        "Ginger": "ginger",
+        "Calico": "calico",
+        "WhiteCat": "whitecat",
+        "BrownCat": "browncat",
+        "Siamese": "siamese",
+        "Tiger": "tiger",
+        "Astronaut": "astronaut",
+        "Batman": "batman",
+        "Demon": "demon",
+        "Santa": "santa",
+        "Vampire": "vampire",
+        "Witch": "witch"
+    }
     
-    # Sleeping: Row 2 (4 frames, 64x64)
-    for i in range(4):
-        frame = sheet.crop((i * 64, 128, (i + 1) * 64, 192))
-        frame.save(f"{out_dir}/kiko_sleep_{i}.png")
-    print("✓ Extracted 4 sleeping frames")
+    action_mapping = {
+        "Sitting": "sitting",
+        "Idle": "idle",
+        "Idle2": "idle2",
+        "Run": "run",
+        "Jump": "jump",
+        "Attack": "attack",
+        "Hurt": "hurt",
+        "Sleep": "sleep",
+        "Die": "die",
+        "Die2": "die2"
+    }
     
-    # Avatar variants: Row 3 (4 variants, 64x64)
-    variants = ["grey", "orange", "black", "white"]
-    for i, name in enumerate(variants):
-        frame = sheet.crop((i * 64, 192, (i + 1) * 64, 256))
-        frame.save(f"{out_dir}/kiko_variant_{name}.png")
-    print("✓ Extracted 4 cat avatar variants")
+    total_frames = 0
     
-    print("\nAll sprite frames extracted successfully to assets/sprites/processed/")
+    for prefix, slug in avatar_mapping.items():
+        for action, action_slug in action_mapping.items():
+            pattern = os.path.join(src_dir, f"{prefix}_{action}_Normal.png")
+            matches = glob.glob(pattern)
+            if not matches:
+                continue
+            strip_path = matches[0]
+            try:
+                im = Image.open(strip_path)
+                frame_width = 32
+                frame_height = 32
+                num_frames = im.width // frame_width
+                for i in range(num_frames):
+                    frame = im.crop((i * frame_width, 0, (i + 1) * frame_width, frame_height))
+                    out_name = f"{slug}_{action_slug}_{i}.png"
+                    frame.save(os.path.join(out_dir, out_name))
+                    total_frames += 1
+            except Exception as e:
+                print(f"Failed to slice {strip_path}: {e}")
+                
+    # Copy accessory fixtures
+    fixtures = [
+        ("CatBedBlue_Normal.png", "cat_bed_blue.png"),
+        ("CatBedBrown_Normal.png", "cat_bed_brown.png"),
+        ("CatBedGreen_Normal.png", "cat_bed_green.png"),
+        ("CatBedPink_Normal.png", "cat_bed_pink.png"),
+        ("CatBedPurple_Normal.png", "cat_bed_purple.png"),
+        ("CatBedRed_Normal.png", "cat_bed_red.png"),
+        ("bowl_Normal.png", "food_bowl.png"),
+        ("bath_Normal.png", "bath_tub.png"),
+        ("cat-food_Normal.png", "fish_treat.png"),
+        ("heart_Normal.png", "heart_icon.png")
+    ]
+    
+    for src_file, dest_file in fixtures:
+        src_path = os.path.join(src_dir, src_file)
+        if os.path.exists(src_path):
+            try:
+                im = Image.open(src_path)
+                im.save(os.path.join(out_dir, dest_file))
+            except Exception as e:
+                print(f"Failed to copy fixture {src_file}: {e}")
+
+    print(f"Done. Extracted {total_frames} frames into {out_dir}")
 
 if __name__ == "__main__":
     slice_sprites()
