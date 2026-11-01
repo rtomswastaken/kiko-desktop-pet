@@ -10,9 +10,9 @@
 
 **A little cat. A big personality.**
 
-A tiny animated desktop companion that lives on your macOS desktop.
+A native animated virtual desktop companion that lives on your macOS desktop.
 
-Kiko walks, sleeps, plays, follows your cursor, discovers cardboard boxes and occasionally gets zoomies.
+Kiko explores your desktop, perches on application window title bars, stalks your cursor, discovers cardboard boxes, plays with toys, and exhibits lively, realistic feline behaviours.
 
 <br/>
 
@@ -27,203 +27,118 @@ Kiko walks, sleeps, plays, follows your cursor, discovers cardboard boxes and oc
 
 ## 🌟 Features
 
-Kiko is built from the ground up to feel like an authentic, low-maintenance desktop companion. Here is the current implementation status:
+Kiko is built from the ground up as a native macOS application designed to feel like a real living creature living on your desktop.
 
-### Completed & Working
-- **🐾 Animated Desktop Companion:** Runs as an ultra-lightweight, borderless, transparent floating window (`NSPanel`) that freely roams your displays without interrupting active applications.
-- **🧠 Autonomous Cat Behaviours:** An intelligent tick-based state machine orchestrates natural feline behaviour—sitting upright, idling, wandering across the desktop, taking restorative naps, and bursting into sudden zoomies.
-- **✨ Dynamic Moods & Personalities:** Mathematical meters track internal **Energy**, **Boredom**, and **Affection**, dynamically adjusting Kiko's mood between *Happy*, *Curious*, *Sleepy*, *Playful*, and *Chaotic*.
-- **🖱️ Cursor Interaction & Following:** Kiko notices mouse movements, tracks your cursor across the screen, and creeps forward playfully when curious.
-- **✋ Petting & Dragging by the Scruff:** Click and hold to pick Kiko up by the scruff, reposition him anywhere on screen with boundary clamping, and pet him to raise affection and happiness.
-- **⚡ Native macOS Implementation:** 100% pure Swift, AppKit, and CoreAnimation. Zero heavy runtimes, no Electron bloat, maintaining under 0.5% idle CPU usage.
+### 🐾 Desktop Integration
+- **Transparent, Borderless Window:** Borderless floating window (`NSPanel`) with `.floating` window level that stays visible above normal application windows.
+- **Retina Crisp Rendering:** Native CoreAnimation pixel rendering with nearest-neighbor interpolation (`kCAFilterNearest`) so pixel art remains sharp on Retina displays.
+- **Multiple Displays & Boundaries:** Automatically detects screen frames and corners; prevents the pet from falling off-screen.
+- **Position Persistence:** Remembers last desktop coordinates across restarts via `UserDefaults`.
 
-### In Development & Planned
-- **📦 Cardboard Box Hiding & Sleeping:** Boxes spawning or dropped on the desktop that Kiko can climb into, hide within, and take long naps.
-- **🪟 Window-Edge Sitting:** Detection of active application window titlebars so Kiko can sit or tightrope-walk along open app borders.
-- **🎲 Random Cat Events:** Midnight knocks, keyboard stalking, and curiosity pounces.
-- **🎮 Mini-Games:** Interactive laser pointer tracking mode and bouncing toy ball.
-- **🎨 Multiple Cat Avatars:** In-app selection between Calico/Orange, Tabby Grey, Shadow Black, and Snow White coat variants.
-- **🎀 Customization & Accessories:** Tiny pixel collars, bells, and holiday hats.
+### 🪟 Application Window & Title-Bar Interaction
+- **Quartz Window Server Detection:** Uses `CGWindowListCopyWindowInfo` to detect on-screen application windows (Safari, Terminal, Finder, Notes, Code, etc.).
+- **Window Perching:** When near an open application, the cat can jump onto the window title bar, rest on the top edge, or walk along the ledge while you work.
+
+### 🧠 Autonomous Behaviour Engine
+- **17 Distinct States:** Finite State Machine with `IDLE`, `WALKING`, `RUNNING`, `PLAYFUL`, `CURIOUS`, `SLEEPING`, `HIDING`, `BOX_IDLE`, `STRETCHING`, `PLAYING`, `WATCHING_CURSOR`, `SURPRISED`, `EXCITED (ZOOMIES)`, `GRUMPY`, `INTERACTING`, `WINDOW_WATCHING`, and `DRAGGED`.
+- **Dynamic Mood Engine:** 9 dynamic moods (*Happy*, *Sleepy*, *Curious*, *Playful*, *Grumpy*, *Excited*, *Bored*, *Scared*, *Relaxed*) that influence movement speed and decision weights.
+- **Continuous Need Meters:** Tracks **Energy**, **Boredom**, and **Affection** with real-time decay and recovery.
+
+### 🖱️ Cursor Interaction & Petting
+- **Curious Stalking:** Turns head/body towards the cursor when within ~220px. Creeps forward playfully and pounces when close.
+- **Petting Gestures:** Moving the cursor gently over the cat detects petting, plays purrs, emits floating hearts (`fx_heart.png`), and boosts affection.
+- **Elastic Dragging & Stretching:** Picking the cat up applies elastic squash-and-stretch. Fast dragging triggers an animated wiggle flail, followed by a soft bounce landing on release.
+
+### 📦 Cardboard Box System
+- **Dedicated Desktop Fixture:** A draggable cardboard box window (`BoxWindow`) with multiple visual states (`empty`, `peeking`, `head_out`).
+- **Inactivity Sleep:** When left unattended for > 2 minutes, the cat wanders over to its box, curls up inside, and falls asleep.
+- **Peeking Eyes:** Moving the cursor near the box makes two glowing eyes peek out, prompting the cat to emerge.
+
+### 🎮 Mini-Games & Toys
+- **🔴 Laser Pointer:** High-intensity red laser dot that follows cursor; cat energetically chases and pounces on it.
+- **🧶 Yarn Ball:** Bouncing yarn ball with real-time physics (velocity, gravity, restitution); cat bats it around the screen.
+- **🦋 Butterfly Chase:** Spawns an animated fluttering butterfly that drifts across the desktop.
+- **🐟 Fish Treat:** Drop a savory fish snack on the desktop for the cat to stalk, eat, and purr.
+
+### 🎨 Multiple Cat Avatars
+Switch seamlessly between 4 avatars with individual personalities and custom coat variations:
+1. **Kiko:** Ginger Tabby — Energetic, curious, cuddly.
+2. **Smokey:** Grey Tabby — Lazy, relaxed, loves sleeping.
+3. **Kuro:** Midnight Void — Mischievous, quick, independent.
+4. **Mochi:** Snow White — Playful, affectionate, sweet.
+
+### 🔊 Retro Audio System
+- Built-in sound effects: Meow, purr, chirp, pounce, snore, footstep.
+- Full volume slider and mute controls.
+
+### ⚙️ Preferences & Status Bar Menu
+- Accessible from the macOS menu bar (`NSStatusItem`).
+- Interactive SwiftUI Settings panel to customize avatar, cat name, scale, volume, and toggles.
 
 ---
 
-## 📸 Preview
-
-<div align="center">
-
-<img src="assets/branding/kiko-logo.png" alt="Kiko Character Logo" width="280" />
-
-<p><em>Authentic pixel-art Kiko sitting frame extracted directly from the character sprite atlas.</em></p>
-
-</div>
-
-> [!NOTE]
-> High-resolution gameplay GIFs and desktop screen recordings will be published in `assets/screenshots/` as interactive releases are packaged.
-
----
-
-## 🚀 Installation & Building
+## 🚀 Building & Running
 
 ### Requirements
 - macOS 13.0 (Ventura) or newer (Sonoma & Sequoia fully supported)
 - Apple Silicon (M1/M2/M3/M4) or Intel Mac
-- Swift 5.9+ / Xcode 15+ (or Apple Command Line Tools)
-- Python 3 (for local sprite slicing)
+- Swift 5.9+ / Command Line Tools
 
-### 1. Clone the Repository
+### Build the Application
 ```bash
-git clone https://github.com/rtomswastaken/kiko-desktop-pet.git
-cd kiko-desktop-pet
+# Compile Kiko and all modules
+swift build --product Kiko
 ```
 
-### 2. Set Up Sprite Assets
-Due to creator licensing restrictions, the raw sprite sheet is not redistributed in Git. Download the free asset pack and slice it locally:
-1. Download `RetroCatsFree.png` from [ToffeeCraft on itch.io](https://toffeecraft.itch.io/cat-pack-pochi).
-2. Place the image at:
-   ```bash
-   cp /path/to/download/RetroCatsFree.png assets/sprites/original/RetroCatsFree.png
-   ```
-3. Slice the individual frames:
-   ```bash
-   python3 scripts/slice_sprites.py
-   ```
-
-### 3. Build & Run
+### Launch Kiko
 ```bash
-# Build with Swift Package Manager
-swift build
-
-# Launch Kiko
+# Run Kiko on your desktop
 swift run Kiko
 ```
 
-Alternatively, double-click `Package.swift` or run `open Package.swift` to launch directly in Xcode.
+### Run Automated Unit Tests
+```bash
+# Execute test suite (43 unit tests covering state machine, math, animations, moods)
+swift run KikoTestRunner
+```
 
 ---
 
-## 🛠️ Tech Stack
-
-- **Language:** [Swift 5.9 / Swift 6](https://swift.org)
-- **Windowing & Display:** [AppKit](https://developer.apple.com/documentation/appkit) (`NSPanel`, `NSStatusBar`, `CALayer`)
-- **Animation & Graphics:** CoreAnimation with nearest-neighbor interpolation (`kCAFilterNearest`) for crisp Retina pixel art
-- **State Machine:** Custom actor-isolated reactive state machine (`PetState`, `BehaviourEngine`)
-- **Audio:** `AppKit.NSSound` and `AVFoundation`
-- **Build System:** Swift Package Manager (SPM)
-
----
-
-## 📁 Project Structure
+## 🛠️ Project Architecture
 
 ```
-kiko-desktop-pet/
-│
-├── README.md                      # Project overview & documentation
-├── LICENSE                        # MIT License & Third-Party notice
-├── .gitignore                     # Swift, Xcode, and asset exclusions
-├── CONTRIBUTING.md                # Contribution guidelines
-├── CHANGELOG.md                   # Release version history
-├── Package.swift                  # Swift Package Manager manifest
+valiant-hubble/
+├── Package.swift                  # SPM manifest defining KikoCore, Kiko, and KikoTestRunner
+├── README.md                      # Documentation & instructions
 │
 ├── assets/
-│   ├── branding/                  # Repository branding & social assets
-│   │   ├── kiko-avatar.png        # Crisp pixel-art avatar (512x512)
-│   │   ├── kiko-logo.png          # High-resolution cat logo (800x800)
-│   │   └── kiko-banner.png        # Social preview banner (1280x640)
-│   │
-│   ├── sprites/                   # Sprite management
-│   │   ├── original/              # Raw sprite drop zone (excluded from Git)
-│   │   ├── processed/             # Sliced 64x64 animation frames
-│   │   └── sprite-mapping.md      # Coordinate atlas & bounding box map
-│   │
-│   └── screenshots/               # Application captures & demo GIFs
+│   ├── audio/                     # Synthesized 16-bit WAV sound effects (meow, purr, chirp, etc.)
+│   ├── branding/                  # Avatar, banner, and logo artwork
+│   └── sprites/
+│       ├── original/              # Original RetroCatsFree.png sprite sheet
+│       └── processed/             # Sliced frames, box states, toys, and particle sprites
 │
 ├── Sources/
-│   ├── App/                       # Lifecycle & NSApplication entry
-│   │   ├── KikoApp.swift          # @main entry struct
-│   │   └── AppDelegate.swift      # Menu bar status item & action hooks
+│   ├── Kiko/                      # Application executable entry point
+│   │   └── main.swift             # @main runner
 │   │
-│   ├── Core/                      # Domain logic & models
-│   │   ├── PetState.swift         # Reactive state & need meters
-│   │   ├── Mood.swift             # Mood definitions & emoji states
-│   │   ├── Personality.swift      # Configurable behavioral traits
-│   │   └── Constants.swift        # Physics constants & timings
-│   │
-│   ├── Animation/                 # Sprite sequencing
-│   │   ├── SpriteAnimation.swift  # Frame timer & ping-pong loop engine
-│   │   ├── AnimationState.swift   # Animation state enums
-│   │   └── SpriteManager.swift    # Asset loader & caching
-│   │
-│   ├── Behaviour/                 # Autonomous AI engine
-│   │   ├── BehaviourEngine.swift  # Main update tick loop
-│   │   ├── BehaviourType.swift    # Action goals (sitting, roaming, zoomies)
-│   │   └── ActionPlanner.swift    # Probabilistic action selector
-│   │
-│   ├── Interaction/               # Mouse & gesture handling
-│   │   ├── InteractionManager.swift # Drag & drop and petting detection
-│   │   └── CursorFollower.swift   # Cursor tracking math
-│   │
-│   ├── Desktop/                   # macOS screen coordination
-│   │   ├── PetWindow.swift        # Borderless transparent NSPanel
-│   │   ├── ScreenManager.swift    # Multi-screen & Dock/MenuBar awareness
-│   │   └── WindowLevelManager.swift # Always-on-top toggle
-│   │
-│   ├── Audio/                     # Sound subsystem
-│   │   ├── SoundManager.swift     # Audio player
-│   │   └── SoundEffect.swift      # Meow and purr sound cues
-│   │
-│   └── Settings/                  # User preferences
-│       └── Preferences.swift      # Persistent UserDefaults storage
+│   └── KikoCore/                  # Core modular framework
+│       ├── Animation/             # SpriteManager, SpriteAnimation, AnimationState
+│       ├── App/                   # AppDelegate & menu bar setup
+│       ├── Audio/                 # SoundManager & SoundEffect
+│       ├── Behaviour/             # BehaviourEngine, BehaviourType, ActionPlanner, RandomEventManager
+│       ├── Core/                  # CatAvatar, Personality, PetState, Mood, Constants
+│       ├── Desktop/               # PetWindow, BoxWindow, WindowDetector, ScreenManager
+│       ├── Interaction/           # InteractionManager, MiniGameManager, CursorFollower
+│       └── Settings/              # Preferences & SettingsWindow (SwiftUI)
 │
-├── Tests/
-│   └── KikoTests.swift            # Unit test suite
-│
-├── Documentation/
-│   ├── ARCHITECTURE.md            # Subsystem architecture & data flow
-│   ├── ANIMATIONS.md              # Frame details & Retina pixel art guide
-│   ├── BEHAVIOUR.md               # AI state transitions & mood equations
-│   └── DEVELOPMENT.md             # Developer environment setup & debugging
-│
-└── scripts/
-    └── slice_sprites.py           # Automated sprite extraction script
+└── Tests/
+    └── main.swift                 # Comprehensive unit test suite runner
 ```
-
----
-
-## 🗺️ Roadmap
-
-- [x] Repository identity, branding assets, and project architecture setup.
-- [x] Swift Package Manager project configuration with modular subsystem structure.
-- [x] Transparent borderless `PetWindow` implementation with Retina nearest-neighbor filtering.
-- [x] Autonomous behaviour state machine (`sitting`, `wandering`, `sleeping`, `zoomies`).
-- [x] Internal continuous meters for energy, boredom, and affection.
-- [x] Mouse drag-and-drop and petting interaction handlers.
-- [x] Frame animation sequencer with ping-pong sleep breathing loops.
-- [ ] Cardboard box item spawning and sleeping integration.
-- [ ] Active window edge and titlebar collision tracking.
-- [ ] Multi-coat avatar selector UI in macOS settings menu.
-- [ ] Sound synthesis for procedural purrs and meows.
-- [ ] Homebrew Cask release packaging.
-
----
-
-## 🤝 Contributing
-
-We love contributions! Please review [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming conventions, PR guidelines, and local testing instructions.
 
 ---
 
 ## 📄 License & Attribution
 
-- **Code & Documentation:** Distributed under the **MIT License**. See [LICENSE](LICENSE) for details.
-- **Third-Party Art Assets:** The original cat character artwork is from the **"Cat Pack - Pochi"** collection created by **ToffeeCraft** on [itch.io](https://toffeecraft.itch.io/cat-pack-pochi).
-  - Free for personal game development and productions.
-  - Raw asset redistribution or resale is strictly prohibited.
-  - Raw sprite sheets are excluded from this repository and must be downloaded directly by users.
-
----
-
-<div align="center">
-
-*Made with curiosity, code and a little bit of cat chaos.*
-
-</div>
+- **Code:** Distributed under the **MIT License**. See [LICENSE](LICENSE).
+- **Art Assets:** Original cat sprite sheet from the **"Cat Pack - Pochi"** collection by **ToffeeCraft** on [itch.io](https://toffeecraft.itch.io/cat-pack-pochi).

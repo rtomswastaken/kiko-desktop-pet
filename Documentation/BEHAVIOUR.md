@@ -1,86 +1,96 @@
-# Behaviour Engine & AI State Machine 🐈
+# Autonomous Behaviour & Mood System 🐈
 
-Kiko is not merely a looped GIF; Kiko acts autonomously based on internal needs, environmental stimuli, and random cat chaos.
-
----
-
-## 1. Internal Need Meters
-
-Kiko tracks three continuous scalar meters (`0.0` to `1.0`):
-
-1. **Energy (`0.0` - Exhausted to `1.0` - Hyperactive):**
-   - Depletes during walking (-0.02 / min) and zoomies (-0.15 / min).
-   - Recovers during sleeping (+0.10 / min) and sitting (+0.03 / min).
-   - When energy drops below `0.20`, sleep probability rises to 90%.
-2. **Boredom (`0.0` - Content to `1.0` - Restless):**
-   - Increases when Kiko remains in one location without user interaction (+0.05 / min).
-   - Decreases when user pets, drags, or feeds Kiko.
-   - High boredom triggers cursor tracking, wandering, or sudden zoomies.
-3. **Affection (`0.0` - Aloof to `1.0` - Cuddly):**
-   - Increases when user clicks or pets Kiko.
-   - Unlocks affectionate purring, loafing close to the active mouse cursor, and greeting chirps.
+Kiko is driven by an autonomous finite-state machine (FSM) that models realistic feline psychology, mood transitions, energy cycles, and environment awareness.
 
 ---
 
-## 2. State Transition Graph
+## 1. Finite-State Machine (FSM)
+
+The cat transitions naturally between these 17 states:
 
 ```
-           ┌──────────────┐
-           │   Sleeping   │
-           └──────▲───────┘
-                  │  (Energy < 0.20)
-                  │
-┌─────────────────┼─────────────────┐
-│                 ▼                 │
-│          ┌──────────────┐         │
-│          │ Sitting/Idle │         │
-│          └──────▲───────┘         │
-│                 │                 │
-│ (Wander Timer)  │  (Boredom > 0.8)│
-▼                 ▼                 ▼
-┌──────────────┐  │         ┌──────────────┐
-│  Wandering   │  │         │   Zoomies    │
-└──────────────┘  │         └──────────────┘
-                  │
-                  │ (User Drag)
-                  ▼
-           ┌──────────────┐
-           │   Dragged    │
-           └──────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                            IDLE                              │
+│                (Sitting, blinking, breathing)                │
+└──────┬──────────────┬──────────────┬──────────────┬──────────┘
+       │              │              │              │
+       ▼              ▼              ▼              ▼
+┌──────────────┐┌──────────────┐┌──────────────┐┌──────────────┐
+│   WALKING    ││   CURIOUS    ││   PLAYFUL    ││   SLEEPING   │
+│  (Exploring) ││(Watching Win)││(Chasing Mouse││(Warm Loaf)   │
+└──────┬───────┘└──────────────┘└──────┬───────┘└──────┬───────┘
+       │                               │               │
+       ▼                               ▼               ▼
+┌──────────────┐                ┌──────────────┐┌──────────────┐
+│WINDOW_WATCHING                │   PLAYING    ││  STRETCHING  │
+│(Perched top) │                │ (Yarn/Laser) ││(Wakeup pose) │
+└──────────────┘                └──────────────┘└──────────────┘
 ```
 
----
-
-## 3. Behaviour Descriptions
-
-### Sitting / Idle
-- Default resting state.
-- Kiko sits upright, blinks, and watches the cursor if it moves near.
-- If stationary for more than 45 seconds, Kiko may curl up and sleep.
-
-### Wandering
-- Kiko picks a random destination on the current display work area (respecting Menu Bar and Dock boundaries).
-- Calculates heading, flips sprite towards the destination, and walks at a leisurely pace.
-- Upon arrival, pauses, sniffs the desktop air, and transitions back to idle.
-
-### Cursor Stalking & Following
-- Triggered when curiosity is high and the mouse cursor is moving smoothly.
-- Kiko creeps toward the cursor, stops a polite 60 pixels away, and watches it move.
-
-### The Zoomies
-- Sudden, uncontrollable burst of feline energy.
-- Kiko sprints back and forth across the screen at 4x normal speed, rebounding off screen borders.
-- Lasts between 6 to 15 seconds, followed by immediate collapse into sitting or sleeping.
-
-### Dragged by Scruff
-- User clicks and holds Kiko.
-- Physics disables autonomous movement; Kiko tracks mouse position with a gentle dangling tilt.
-- Releasing drops Kiko with gravity until colliding with the Dock, bottom edge, or open application window top.
+### Full State Catalog:
+- **`IDLE`**: Upright sitting posture, soft breathing, tail twitches, periodic blinks.
+- **`WALKING`**: Navigates across screen or window ledge towards random or target coordinates.
+- **`RUNNING`**: Brisk walk cycle at 2x speed.
+- **`PLAYFUL`**: Investigates and stalks moving mouse cursor or desktop toys.
+- **`CURIOUS`**: Pauses and observes active application windows or cursor.
+- **`SLEEPING`**: Curled into a loaf with gentle snoozing sound and `Zzz` bubbles.
+- **`HIDING`**: Inside cardboard box with two glowing eyes peeking out.
+- **`BOX_IDLE`**: Resting in cardboard box with head and paws over the front edge.
+- **`STRETCHING`**: Extends front paws and arches back after waking up.
+- **`PLAYING`**: Chasing the yarn ball, laser pointer, or butterfly.
+- **`WATCHING_CURSOR`**: Sits in place tracking the cursor angle.
+- **`SURPRISED`**: Brief recoil and startle reaction.
+- **`EXCITED (ZOOMIES)`**: Chaotic high-speed sprint across the desktop bouncing off edges.
+- **`GRUMPY`**: Aloof mood where the cat ignores clicks or walks away.
+- **`INTERACTING`**: Being petted by the user, emitting hearts.
+- **`WINDOW_WATCHING`**: Resting on top edge / title bar of an application window.
+- **`DRAGGED`**: Being carried by the mouse with elastic squash-and-stretch.
 
 ---
 
-## 4. Time-of-Day Influences
+## 2. Dynamic Moods
 
-- **Morning (07:00 - 10:00):** Moderate energy, curious, greets user.
-- **Afternoon (13:00 - 16:00):** High sleepiness, frequent sunbeam naps.
-- **Evening / Night (20:00 - 02:00):** Prime zoomie hours, highly playful and active.
+Mood alters movement speed, transition probabilities, and animation cadence:
+
+| Mood | Behavior Influence | Speed Multiplier |
+|---|---|---|
+| **Happy** | Frequent purrs, playful interactions, hearts | 1.1x |
+| **Sleepy** | Slower movement, yawns, curls up to sleep | 0.65x |
+| **Curious** | Investigates window borders and cursor motion | 0.95x |
+| **Playful** | Stalks cursor, initiates toy chases | 1.35x |
+| **Grumpy** | Occasionally ignores the user, turns away | 0.5x |
+| **Excited** | Sudden zoomies sprint across desktop | 2.2x |
+| **Bored** | Searches for something interesting or heads to box | 0.75x |
+| **Scared** | Startled retreat into cardboard box | 2.5x |
+| **Relaxed** | Peacefully loafs and watches the screen | 0.8x |
+
+---
+
+## 3. Cardboard Box System
+
+The cardboard box is a dedicated desktop fixture:
+1. **Discovery:** When bored or low on energy, the cat navigates toward the cardboard box.
+2. **Entering:** Cat climbs inside; the window updates to `cardboard_box_peeking.png`.
+3. **Inactivity Sleep:** If the user does not interact with the Mac for over 2 minutes, the cat automatically curls up in the box to sleep.
+4. **Waking:** Moving the cursor near the box or clicking it prompts the cat to peek out (`*_box_head_out.png`) and emerge to play!
+
+---
+
+## 4. Window & Title-Bar Interaction
+
+Using macOS Quartz Window Server APIs (`CGWindowListCopyWindowInfo`), the pet continuously detects visible application windows:
+- **Title Bar Perching:** When walking near an open window (e.g. Safari, Terminal, Notes), the cat can jump up and sit directly on the title bar.
+- **Window Ledge Walking:** Walks along the upper boundary of active windows.
+- **Non-Interference:** Does not block window traffic lights or title bar drag controls.
+
+---
+
+## 5. Random Events
+
+Cooldown-governed spontaneous events:
+- **Zoomies:** Uncontrollable sprint across the display.
+- **Butterfly Chase:** Butterfly flutters across screen; cat pursues.
+- **Dreaming:** Sleep state with floating `Zzz` particles.
+- **Tail Chasing:** Rapid 360° spin in place.
+- **Dramatic Flop:** Abruptly drops into a warm loaf.
+- **Random Meow:** Subtle audio chirp or meow.

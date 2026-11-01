@@ -10,18 +10,27 @@ let package = Package(
         .executable(
             name: "Kiko",
             targets: ["Kiko"]
+        ),
+        .executable(
+            name: "KikoTestRunner",
+            targets: ["KikoTestRunner"]
         )
     ],
     dependencies: [],
     targets: [
+        .target(
+            name: "KikoCore",
+            dependencies: [],
+            path: "Sources/KikoCore"
+        ),
         .executableTarget(
             name: "Kiko",
-            dependencies: [],
-            path: "Sources"
+            dependencies: ["KikoCore"],
+            path: "Sources/Kiko"
         ),
-        .testTarget(
-            name: "KikoTests",
-            dependencies: ["Kiko"],
+        .executableTarget(
+            name: "KikoTestRunner",
+            dependencies: ["KikoCore"],
             path: "Tests"
         )
     ]
