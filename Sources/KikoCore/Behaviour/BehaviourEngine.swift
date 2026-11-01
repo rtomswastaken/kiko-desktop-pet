@@ -1,4 +1,4 @@
-// Sources/Behaviour/BehaviourEngine.swift
+// Sources/KikoCore/Behaviour/BehaviourEngine.swift
 import AppKit
 
 @MainActor
@@ -28,6 +28,15 @@ public final class BehaviourEngine {
             stateTimeRemaining = Double.random(in: 2.0...6.0)
             PetState.shared.velocity = .zero
             
+        case .walking:
+            stateTimeRemaining = Double.random(in: Constants.minWalkDuration...Constants.maxWalkDuration)
+            walkTarget = ScreenManager.shared.randomPointInWorkArea()
+            
+        case .running, .excited:
+            stateTimeRemaining = Double.random(in: 3.5...7.0)
+            walkTarget = ScreenManager.shared.randomPointInWorkArea()
+            SoundManager.shared.play(.chirp)
+            
         case .jumping:
             stateTimeRemaining = 0.9
             PetState.shared.velocity = .zero
@@ -37,15 +46,6 @@ public final class BehaviourEngine {
             stateTimeRemaining = 1.4
             PetState.shared.velocity = .zero
             SoundManager.shared.play(.meow)
-            
-        case .walking:
-            stateTimeRemaining = Double.random(in: Constants.minWalkDuration...Constants.maxWalkDuration)
-            walkTarget = ScreenManager.shared.randomPointInWorkArea()
-            
-        case .running, .excited:
-            stateTimeRemaining = Double.random(in: 3.5...7.0)
-            walkTarget = ScreenManager.shared.randomPointInWorkArea()
-            SoundManager.shared.play(.chirp)
             
         case .sleeping:
             stateTimeRemaining = Double.random(in: 8.0...20.0)
@@ -63,7 +63,7 @@ public final class BehaviourEngine {
             PetState.shared.isInBox = true
             
         case .stretching:
-            stateTimeRemaining = 1.05
+            stateTimeRemaining = 1.2
             PetState.shared.velocity = .zero
             PetState.shared.isInBox = false
             
@@ -117,7 +117,9 @@ public final class BehaviourEngine {
         // Normal cursor reaction logic if cursor is active and nearby
         let mouseLocation = NSEvent.mouseLocation
         let petPos = petState.position
-        let distToCursor = hypot(mouseLocation.x - petPos.x, mouseLocation.y - petPos.y)
+        let size = Constants.defaultWindowSize
+        let catCenter = CGPoint(x: petPos.x + size / 2.0, y: petPos.y + size / 2.0)
+        let distToCursor = hypot(mouseLocation.x - catCenter.x, mouseLocation.y - catCenter.y)
         
         if Preferences.shared.cursorTrackingEnabled &&
             distToCursor < Constants.cursorDetectRadius &&
@@ -125,15 +127,17 @@ public final class BehaviourEngine {
             currentBehaviour != .sleeping &&
             currentBehaviour != .grumpy {
             
-            // Cat turns towards cursor
-            petState.isFacingLeft = mouseLocation.x < petPos.x
+            // Cat turns towards cursor:
+            // Mouse is to the left of cat center -> isFacingLeft = true
+            // Mouse is to the right of cat center -> isFacingLeft = false
+            petState.isFacingLeft = mouseLocation.x < catCenter.x
             
             // If playful or curious, approach cursor
             if distToCursor > Constants.cursorPounceRadius && (currentBehaviour == .playful || currentBehaviour == .walking || currentBehaviour == .curious) {
                 let speed = (currentBehaviour == .playful ? Constants.runSpeed : Constants.walkSpeed) * petState.currentMood.movementSpeedMultiplier
                 let step = min(distToCursor, CGFloat(speed * deltaTime))
-                let dx = mouseLocation.x - petPos.x
-                let dy = mouseLocation.y - petPos.y
+                let dx = mouseLocation.x - catCenter.x
+                let dy = mouseLocation.y - catCenter.y
                 let newX = petPos.x + (dx / distToCursor) * step
                 let newY = petPos.y + (dy / distToCursor) * step
                 petState.position = CGPoint(x: newX, y: newY)
@@ -174,9 +178,9 @@ public final class BehaviourEngine {
         let dy = walkTarget.y - pos.y
         let dist = hypot(dx, dy)
         
-        if dist < 20.0 {
+        if dist < 16.0 {
             // Reached waypoint early
-            transitionTo(.idle)
+            transitionTo(.sitting)
             return
         }
         
@@ -193,6 +197,7 @@ public final class BehaviourEngine {
         let nx = pos.x + (dx / dist) * step
         let ny = pos.y + (dy / dist) * step
         petState.position = CGPoint(x: nx, y: ny)
+        // Moving left when target is to the left (dx < 0)
         petState.isFacingLeft = dx < 0
     }
     
@@ -205,7 +210,7 @@ public final class BehaviourEngine {
         
         petState.isFacingLeft = dx < 0
         
-        if dist < 24.0 {
+        if dist < 20.0 {
             // Reached target
             if isChasingLaser {
                 SoundManager.shared.play(.pounce)

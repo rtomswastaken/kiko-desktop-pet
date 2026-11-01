@@ -1,4 +1,4 @@
-// Sources/Desktop/PetWindow.swift
+// Sources/KikoCore/Desktop/PetWindow.swift
 import AppKit
 
 @MainActor
@@ -18,7 +18,7 @@ public final class PetWindow: NSPanel {
     private var fxTimer: TimeInterval = 0.0
     
     public init() {
-        let size = Constants.defaultWindowSize
+        let size = Constants.defaultWindowSize // 64.0 pt
         let savedX = UserDefaults.standard.object(forKey: "kiko.lastPosX") as? CGFloat ?? 220.0
         let savedY = UserDefaults.standard.object(forKey: "kiko.lastPosY") as? CGFloat ?? 160.0
         let initialRect = NSRect(x: savedX, y: savedY, width: size, height: size)
@@ -26,9 +26,14 @@ public final class PetWindow: NSPanel {
         catImageView = NSImageView(frame: NSRect(x: 0, y: 0, width: size, height: size))
         catImageView.imageScaling = .scaleProportionallyUpOrDown
         catImageView.wantsLayer = true
-        catImageView.layer?.magnificationFilter = .nearest
+        if let layer = catImageView.layer {
+            layer.magnificationFilter = .nearest
+            layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            layer.position = CGPoint(x: size / 2.0, y: size / 2.0)
+            layer.bounds = NSRect(x: 0, y: 0, width: size, height: size)
+        }
         
-        fxImageView = NSImageView(frame: NSRect(x: size * 0.35, y: size * 0.7, width: 24, height: 24))
+        fxImageView = NSImageView(frame: NSRect(x: size * 0.35, y: size * 0.65, width: 20, height: 20))
         fxImageView.imageScaling = .scaleProportionallyUpOrDown
         fxImageView.wantsLayer = true
         fxImageView.isHidden = true
@@ -71,9 +76,22 @@ public final class PetWindow: NSPanel {
         behaviourEngine.update(deltaTime: dt)
         
         let petState = PetState.shared
+        let size = Constants.defaultWindowSize
         
-        // If cat is inside cardboard box, hide pet window (cat is visible in BoxWindow)
-        if petState.isInBox {
+        // Check cursor distance to cat center
+        let mouseLocation = NSEvent.mouseLocation
+        let catCenter = CGPoint(x: petState.position.x + size / 2.0, y: petState.position.y + size / 2.0)
+        let distToCursor = hypot(mouseLocation.x - catCenter.x, mouseLocation.y - catCenter.y)
+        
+        // If cursor approaches, cat emerges from box and is guaranteed visible
+        if distToCursor < Constants.cursorDetectRadius {
+            if petState.isInBox {
+                petState.isInBox = false
+            }
+            if self.alphaValue != 1.0 && Preferences.shared.isPetVisible {
+                self.alphaValue = 1.0
+            }
+        } else if petState.isInBox {
             if !self.alphaValue.isZero {
                 self.alphaValue = 0.0
             }
@@ -87,7 +105,6 @@ public final class PetWindow: NSPanel {
         if Preferences.shared.windowInteractionsEnabled &&
             (behaviourEngine.currentBehaviour == .walking || behaviourEngine.currentBehaviour == .idle) {
             if let titleBar = WindowDetector.shared.findNearestTitleBar(to: petState.position, maxDistance: 40.0) {
-                // If cat is very close to title bar, it can rest on top of it!
                 if !petState.isPerchedOnWindow && Double.random(in: 0...1) < 0.08 {
                     petState.isPerchedOnWindow = true
                     petState.position.y = titleBar.topEdgeY
@@ -130,7 +147,7 @@ public final class PetWindow: NSPanel {
             catImageView.image = frameImg
         }
         
-        // Horizontal orientation (flip facing right)
+        // Horizontal orientation (proper facing direction)
         updateTransform()
         
         // Floating particle decay
@@ -148,23 +165,24 @@ public final class PetWindow: NSPanel {
         
         var transform = CATransform3DIdentity
         
-        // Horizontal flip: default sprite faces left
-        if !PetState.shared.isFacingLeft {
+        // kiko_cat_sprites naturally face RIGHT by default!
+        // When PetState.shared.isFacingLeft is true, mirror horizontally:
+        if PetState.shared.isFacingLeft {
             transform = CATransform3DScale(transform, -1.0, 1.0, 1.0)
         }
         
         // Elastic squash & stretch during dragging
         if InteractionManager.shared.isDragging {
             let speed = hypot(dragVelocity.x, dragVelocity.y)
-            if speed > 400.0 {
+            if speed > 300.0 {
                 // Fast drag wiggle flail
                 wigglePhase += 0.4
-                let angle = sin(wigglePhase) * 0.18
+                let angle = sin(wigglePhase) * 0.15
                 transform = CATransform3DRotate(transform, angle, 0, 0, 1)
-                transform = CATransform3DScale(transform, 0.85, 1.25, 1.0)
+                transform = CATransform3DScale(transform, 0.85, 1.20, 1.0)
             } else {
                 // Gentle stretch upward
-                transform = CATransform3DScale(transform, 0.90, 1.15, 1.0)
+                transform = CATransform3DScale(transform, 0.92, 1.12, 1.0)
             }
         }
         

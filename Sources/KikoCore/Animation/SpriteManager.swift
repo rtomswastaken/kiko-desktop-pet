@@ -48,17 +48,37 @@ public final class SpriteManager {
             return img
         }
         
+        // Avatar-specific fallbacks if avatar lacks idle2 or die
+        if state == .idle2 {
+            let fallbackIdle = "\(prefix)_idle_\(frameIndex % 7).png"
+            if let idleImg = loadImage(named: fallbackIdle) {
+                imageCache[key] = idleImg
+                return idleImg
+            }
+        }
+        
+        if state == .die {
+            let fallbackHurt = "\(prefix)_hurt_\(frameIndex % 7).png"
+            if let hurtImg = loadImage(named: fallbackHurt) {
+                imageCache[key] = hurtImg
+                return hurtImg
+            }
+        }
+        
         // Fallback to ginger (default avatar) if variant file missing
-        let fallbackFilename = "ginger_\(state.rawValue)_\(frameIndex).png"
-        if let fallbackImg = loadImage(named: fallbackFilename) {
+        let fallbackGinger = "ginger_\(state.rawValue)_\(frameIndex).png"
+        if let fallbackImg = loadImage(named: fallbackGinger) {
             imageCache[key] = fallbackImg
             return fallbackImg
         }
         
-        // Fallback to idle 0
-        if let idle0 = loadImage(named: "\(prefix)_idle_0.png") ?? loadImage(named: "ginger_idle_0.png") {
-            imageCache[key] = idle0
-            return idle0
+        // Guaranteed fallback to any valid standing/sitting frame so cat NEVER vanishes
+        if let fallbackAny = loadImage(named: "\(prefix)_idle_0.png") ??
+                             loadImage(named: "\(prefix)_sitting_0.png") ??
+                             loadImage(named: "ginger_idle_0.png") ??
+                             loadImage(named: "ginger_sitting_0.png") {
+            imageCache[key] = fallbackAny
+            return fallbackAny
         }
         
         return nil

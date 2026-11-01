@@ -44,7 +44,6 @@ public final class RandomEventManager {
     public func triggerRandomEvent() {
         let events: [() -> Void] = [
             { [weak self] in self?.triggerZoomiesEvent() },
-            { [weak self] in self?.triggerButterflyEvent() },
             { [weak self] in self?.triggerBoxObsessionEvent() },
             { [weak self] in self?.triggerWindowWatchingEvent() },
             { [weak self] in self?.triggerDramaticFlopEvent() },
@@ -60,10 +59,6 @@ public final class RandomEventManager {
     
     private func triggerZoomiesEvent() {
         BehaviourEngine.shared.triggerZoomies()
-    }
-    
-    private func triggerButterflyEvent() {
-        MiniGameManager.shared.startButterfly()
     }
     
     private func triggerBoxObsessionEvent() {

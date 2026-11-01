@@ -143,9 +143,6 @@ public struct SettingsView: View {
                         Button("🧶 Yarn Ball") {
                             MiniGameManager.shared.startYarnBall()
                         }
-                        Button("🦋 Butterfly") {
-                            MiniGameManager.shared.startButterfly()
-                        }
                         Button("🐟 Fish Treat") {
                             MiniGameManager.shared.dropFishTreat()
                         }

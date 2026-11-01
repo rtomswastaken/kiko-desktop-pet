@@ -61,10 +61,6 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         yarnItem.target = self
         playMenu.addItem(yarnItem)
         
-        let butterflyItem = NSMenuItem(title: "🦋 Butterfly Chase", action: #selector(startButterfly), keyEquivalent: "b")
-        butterflyItem.target = self
-        playMenu.addItem(butterflyItem)
-        
         let treatItem = NSMenuItem(title: "🐟 Give Fish Treat", action: #selector(giveTreat), keyEquivalent: "t")
         treatItem.target = self
         playMenu.addItem(treatItem)
@@ -157,10 +153,6 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     
     @objc private func startYarnBall() {
         MiniGameManager.shared.startYarnBall()
-    }
-    
-    @objc private func startButterfly() {
-        MiniGameManager.shared.startButterfly()
     }
     
     @objc private func giveTreat() {

@@ -1,4 +1,4 @@
-// Sources/Interaction/MiniGameManager.swift
+// Sources/KikoCore/Interaction/MiniGameManager.swift
 import AppKit
 
 @MainActor
@@ -11,9 +11,6 @@ public final class MiniGameManager {
     private var toyTimer: Timer?
     private var toyPosition: CGPoint = .zero
     private var toyVelocity: CGVector = .zero
-    private var isButterfly: Bool = false
-    private var butterflyFrameIndex: Int = 0
-    private var butterflyTime: TimeInterval = 0.0
     
     private init() {}
     
@@ -39,7 +36,7 @@ public final class MiniGameManager {
         endCurrentGame()
         
         let colorIdx = Int.random(in: 0...7)
-        let win = createItemWindow(imageName: "yarn_ball_\(colorIdx).png", size: 36)
+        let win = createItemWindow(imageName: "yarn_ball_\(colorIdx).png", size: 28)
         activeToyWindow = win
         
         let screen = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
@@ -84,7 +81,7 @@ public final class MiniGameManager {
         
         // Check if cat reached yarn ball
         let petPos = PetState.shared.position
-        if hypot(toyPosition.x - petPos.x, toyPosition.y - petPos.y) < 40.0 {
+        if hypot(toyPosition.x - petPos.x, toyPosition.y - petPos.y) < 32.0 {
             // Bat the ball!
             let kickDirection: CGFloat = PetState.shared.isFacingLeft ? -1.0 : 1.0
             toyVelocity.dx = kickDirection * CGFloat.random(in: 180...320)
@@ -94,72 +91,27 @@ public final class MiniGameManager {
         }
     }
     
-    public func startButterfly() {
-        endCurrentGame()
-        
-        let win = createItemWindow(imageName: "butterfly_0.png", size: 32)
-        activeToyWindow = win
-        isButterfly = true
-        
-        let screen = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
-        toyPosition = CGPoint(x: screen.minX + 50, y: screen.midY)
-        win.setFrameOrigin(toyPosition)
-        
-        BehaviourEngine.shared.transitionTo(.curious)
-        
-        toyTimer = Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated {
-                self?.updateButterfly()
-            }
-        }
-    }
-    
-    private func updateButterfly() {
-        guard let win = activeToyWindow, let imgView = win.contentView?.subviews.first as? NSImageView else { return }
-        butterflyTime += 0.04
-        
-        // Wing flap animation
-        if Int(butterflyTime * 15) % 2 == 0 {
-            imgView.image = SpriteManager.shared.specialImage(named: "butterfly_0.png")
-        } else {
-            imgView.image = SpriteManager.shared.specialImage(named: "butterfly_1.png")
-        }
-        
-        // Gentle undulating flight
-        toyPosition.x += 2.8
-        toyPosition.y += sin(butterflyTime * 3.5) * 4.0
-        
-        let screen = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
-        if toyPosition.x > screen.maxX + 40 {
-            endCurrentGame()
-            return
-        }
-        
-        win.setFrameOrigin(toyPosition)
-        BehaviourEngine.shared.customTargetPoint = toyPosition
-    }
-    
     public func dropFishTreat() {
         endCurrentGame()
         
-        let win = createItemWindow(imageName: "fish_treat.png", size: 36)
+        let win = createItemWindow(imageName: "fish_treat.png", size: 28)
         activeToyWindow = win
         
-        // Drop treat 80px in front of cat
+        // Drop treat in front of cat
         let petPos = PetState.shared.position
         let dir: CGFloat = PetState.shared.isFacingLeft ? -1.0 : 1.0
-        toyPosition = CGPoint(x: petPos.x + dir * 120, y: petPos.y)
+        toyPosition = CGPoint(x: petPos.x + dir * 80, y: petPos.y)
         win.setFrameOrigin(toyPosition)
         
         BehaviourEngine.shared.customTargetPoint = toyPosition
         BehaviourEngine.shared.transitionTo(.walking)
         
         // Wait until cat reaches treat
-        toyTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] timer in
+        toyTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated {
                 guard let self = self else { return }
                 let currentPetPos = PetState.shared.position
-                if hypot(self.toyPosition.x - currentPetPos.x, self.toyPosition.y - currentPetPos.y) < 35.0 {
+                if hypot(self.toyPosition.x - currentPetPos.x, self.toyPosition.y - currentPetPos.y) < 28.0 {
                     // Cat ate treat!
                     SoundManager.shared.play(.purr)
                     PetState.shared.feedTreat()
@@ -174,8 +126,6 @@ public final class MiniGameManager {
         toyTimer = nil
         activeToyWindow?.orderOut(nil)
         activeToyWindow = nil
-        isButterfly = false
-        butterflyTime = 0.0
         BehaviourEngine.shared.customTargetPoint = nil
         BehaviourEngine.shared.isChasingLaser = false
         BehaviourEngine.shared.isChasingYarn = false
